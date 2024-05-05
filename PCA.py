@@ -4,7 +4,6 @@ from PyQt5.QtGui import QImage
 matplotlib.use('TkAgg')
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
 

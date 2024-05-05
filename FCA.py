@@ -6,7 +6,8 @@ import cv2
 import numpy as np
 from sklearn.decomposition import FactorAnalysis
 
-def function(image_path):
+
+def function(image_path, saved_number):
     # Загрузка цветного изображения
     img = cv2.imread(image_path)
 
@@ -18,7 +19,7 @@ def function(image_path):
     noisy_img = np.clip(img, 0, 255).astype(np.uint8)
 
     # Применение факторного анализа для удаления шумов
-    fa = FactorAnalysis(n_components=100)
+    fa = FactorAnalysis(n_components = saved_number)
     img_flattened = img.reshape(-1, 3)
     img_restored = fa.fit_transform(img_flattened)
 

@@ -1,8 +1,8 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QHBoxLayout, QMenu, QAction, QWidget, \
-    QFileDialog, QMessageBox
-from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QPixmap
+    QFileDialog, QMessageBox, QLineEdit
+from PyQt5.QtCore import QSize, QEventLoop
+from PyQt5.QtGui import QPixmap, QFont
 
 import FCA
 import ICA
@@ -13,7 +13,11 @@ import locale
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.saved_number = None
         locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+        font = QFont()
+        font.setPointSize(11)
+        initial_image = QPixmap("no-img.jpg")
         self.file_name = None
         self.selected_method = ""
         self.setWindowTitle("Simple program")
@@ -21,20 +25,25 @@ class Window(QMainWindow):
         self.new_text = QLabel(self)
 
         main_text = QLabel(self)
+        main_text.move(600, 200)
         main_text.setText("Изначальное изображение:")
-        main_text.move(500, 200)
+        main_text.setFont(font)
         main_text.adjustSize()
 
+
         self.method_label = QLabel(self)
-        self.method_label.move(500, 100)
+        self.method_label.move(700, 100)
+        self.method_label.setFont(font)
         self.method_label.adjustSize()
         self.image_label1 = QLabel(self)
-        self.image_label1.setFixedSize(500, 500)
+        self.image_label1.setFixedSize(800, 800)
+        self.image_label1.setPixmap(initial_image)
 
         self.image_label2 = QLabel(self)
         self.image_label2.setFixedSize(500, 500)
 
         layout = QHBoxLayout()
+        layout.setContentsMargins(300, 0, 0, 0)
         layout.addWidget(self.image_label1)
         layout.addWidget(self.image_label2)
 
@@ -43,6 +52,8 @@ class Window(QMainWindow):
         self.setCentralWidget(central_widget)
 
         self.popup_menu = QMenu(self)
+        self.popup_menu.setFixedSize(200, 110)
+        self.popup_menu.setFont(font)
         PCA_action = QAction("PCA", self)
         ICA_action = QAction("ICA", self)
         FCA_action = QAction("FCA", self)
@@ -51,9 +62,10 @@ class Window(QMainWindow):
         self.popup_menu.addAction(FCA_action)
 
         btn = QPushButton(self)
-        btn.move(850, 800)
+        btn.move(50, 400)
         btn.setText("Методы")
-        btn.setFixedWidth(200)
+        btn.setFixedSize(200, 70)
+        btn.setFont(font)
         btn.setMenu(self.popup_menu)
 
         PCA_action.triggered.connect(self.PCA_triggered)
@@ -62,16 +74,24 @@ class Window(QMainWindow):
         btn.clicked.connect(self.add_label)
 
         file_btn = QPushButton(self)
-        file_btn.move(600, 800)
+        file_btn.move(50, 200)
         file_btn.setText("Выбрать файл")
-        file_btn.setFixedWidth(200)
+        file_btn.setFixedSize(200, 70)
+        file_btn.setFont(font)
         file_btn.clicked.connect(self.open_file_dialog)
 
         save_processed_btn = QPushButton(self)
-        save_processed_btn.move(1100, 800)
+        save_processed_btn.move(50, 800)
         save_processed_btn.setText("Сохранить обработанное изображение")
-        save_processed_btn.setFixedWidth(400)
+        save_processed_btn.setFixedSize(420, 70)
+        save_processed_btn.setFont(font)
         save_processed_btn.clicked.connect(self.save_processed_image)
+
+        self.number_input = QLineEdit(self)
+        self.number_input.setGeometry(50, 520, 100, 30)  # Укажите координаты и размер поля ввода
+        self.number_input.setFixedSize(200, 50)
+        self.number_input.setFont(font)
+        self.number_input.setVisible(False)  # Начально скрываем поле ввода
 
     def save_processed_image(self):
         processed_image = None
@@ -143,15 +163,22 @@ class Window(QMainWindow):
         self.selected_method = "FCA"
         self.add_label()
         image_path = self.file_name
+        self.number_input.setVisible(True)
+        self.number_input.textChanged.connect(self.save_number)
 
         pixmap5 = QPixmap(image_path)
         pixmap5 = pixmap5.scaled(QSize(500, 500))
 
-        processed_image = FCA.function(image_path)
+        self.image_label1.setPixmap(pixmap5)
+
+        loop = QEventLoop()
+        self.number_input.returnPressed.connect(loop.quit)
+        loop.exec_()
+
+        processed_image = FCA.function(image_path, self.saved_number)
         pixmap6 = QPixmap(processed_image)
         pixmap6 = pixmap6.scaled(QSize(500, 500))
 
-        self.image_label1.setPixmap(pixmap5)
         self.image_label2.setPixmap(pixmap6)
 
     def add_label(self):
@@ -159,6 +186,14 @@ class Window(QMainWindow):
         self.method_label.move(1350, 200)
         self.method_label.adjustSize()
 
+    def save_number(self):
+        number_text = self.number_input.text()
+        try:
+            number = int(number_text)
+            self.saved_number = number
+            self.popup_menu.setEnabled(True)
+        except ValueError:
+            pass
 
 def application():
     app = QApplication(sys.argv)
