@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QHBo
 from PyQt5.QtCore import QSize, QEventLoop
 from PyQt5.QtGui import QPixmap, QFont
 
+from FCA import function
 import FCA
 import ICA
 import PCA
@@ -162,6 +163,7 @@ class Window(QMainWindow):
     def FCA_triggered(self):
         self.selected_method = "FCA"
         self.add_label()
+
         image_path = self.file_name
         self.number_input.setVisible(True)
         self.number_input.textChanged.connect(self.save_number)
@@ -174,8 +176,9 @@ class Window(QMainWindow):
         loop = QEventLoop()
         self.number_input.returnPressed.connect(loop.quit)
         loop.exec_()
+        self.number_input.setVisible(False)
 
-        processed_image = FCA.function(image_path, self.saved_number)
+        processed_image = function(image_path, self.saved_number)
         pixmap6 = QPixmap(processed_image)
         pixmap6 = pixmap6.scaled(QSize(500, 500))
 

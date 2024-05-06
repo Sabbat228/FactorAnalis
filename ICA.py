@@ -25,7 +25,7 @@ def function(image_path):
     X_scaled = scaler.fit_transform(X)
 
     # Применение ICA
-    ica = FastICA(n_components=3, max_iter=1000, tol=0.0001)
+    ica = FastICA(n_components=1, max_iter=1000, tol=0.0001)
     X_transformed = ica.fit_transform(X_scaled)
 
     # Восстановление изображения из преобразованных данных
