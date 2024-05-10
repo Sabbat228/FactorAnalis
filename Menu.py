@@ -102,7 +102,7 @@ class Window(QMainWindow):
         elif self.selected_method == "ICA":
             processed_image = ICA.function(self.file_name)
         elif self.selected_method == "FCA":
-            processed_image = FCA.function(self.file_name)
+            processed_image = FCA.function(self.file_name, self.saved_number)
         else:
             error_message = "Вы не выбрали изображение"
             QMessageBox.critical(self, "Ошибка", error_message)
