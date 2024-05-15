@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QHBoxLayout, QMenu, QAction, QWidget, \
     QFileDialog, QMessageBox, QLineEdit
-from PyQt5.QtCore import QSize, QEventLoop
+from PyQt5.QtCore import QSize, QEventLoop, Qt
 from PyQt5.QtGui import QPixmap, QFont
 
 from FCA import function
@@ -30,7 +30,6 @@ class Window(QMainWindow):
         main_text.setText("Изначальное изображение:")
         main_text.setFont(font)
         main_text.adjustSize()
-
 
         self.method_label = QLabel(self)
         self.method_label.move(700, 100)
@@ -127,7 +126,8 @@ class Window(QMainWindow):
 
     def load_image(self, image_path):
         pixmap = QPixmap(image_path)
-        self.image_label1.setPixmap(pixmap)
+        scaled_pixmap = pixmap.scaled(self.image_label1.size(), Qt.KeepAspectRatio)
+        self.image_label1.setPixmap(scaled_pixmap)
         self.image_label1.adjustSize()
 
     def PCA_triggered(self):
@@ -160,6 +160,9 @@ class Window(QMainWindow):
         self.image_label1.setPixmap(pixmap3)
         self.image_label2.setPixmap(pixmap4)
 
+        self.image_label1.adjustSize()
+        self.image_label2.adjustSize()
+
     def FCA_triggered(self):
         self.selected_method = "FCA"
         self.add_label()
@@ -178,7 +181,7 @@ class Window(QMainWindow):
         loop.exec_()
         self.number_input.setVisible(False)
 
-        processed_image = function(image_path, self.saved_number)
+        processed_image = function(image_path)
         pixmap6 = QPixmap(processed_image)
         pixmap6 = pixmap6.scaled(QSize(500, 500))
 
